@@ -1,8 +1,12 @@
+#> cd C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0
+
+
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-import cv2
+import cv
 import os
 from zipfile import ZipFile
 import time
@@ -15,9 +19,11 @@ from sklearn.metrics import confusion_matrix
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
-from tensorflow.keras.layers import Conv2D, AveragePooling2D, GlobalAveragePooling2D
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, GlobalMaxPooling2D
 from tensorflow.keras import utils
 from tensorflow.keras.callbacks import TensorBoard, ModelCheckpoint
+from keras.models import load_model
+
 
 # Setting random seeds to reduce the amount of randomness in the neural net weights and results.
 # The results may still not be exactly reproducible.
@@ -119,30 +125,30 @@ test_dataset = test_dataset.map(_parse_function)
 # test_dataset = test_dataset.repeat(3)
 test_dataset = test_dataset.batch(512)    # Same as batch_size hyperparameter in model.fit() below.
 
-
+'''
 # Defining the architecture of the sequential neural network.
 
 final_cnn = Sequential()
 
-# Input layer with 32 filters, followed by an AveragePooling2D layer.
+# Input layer with 32 filters, followed by an MaxPooling2D layer.
 final_cnn.add(Conv2D(filters=32, kernel_size=3, activation='relu', input_shape=(200, 200, 1)))    # 3rd dim = 1 for grayscale images.
-final_cnn.add(AveragePooling2D(pool_size=(2,2)))
+final_cnn.add(MaxPooling2D(pool_size=(2,2)))
 
 # Three Conv2D layers with filters increasing by a factor of 2 for every successive Conv2D layer.
 final_cnn.add(Conv2D(filters=64, kernel_size=3, activation='relu'))
-final_cnn.add(AveragePooling2D(pool_size=(2,2)))
+final_cnn.add(MaxPooling2D(pool_size=(2,2)))
 
 final_cnn.add(Conv2D(filters=128, kernel_size=3, activation='relu'))
-final_cnn.add(AveragePooling2D(pool_size=(2,2)))
+final_cnn.add(MaxPooling2D(pool_size=(2,2)))
 
 final_cnn.add(Conv2D(filters=256, kernel_size=3, activation='relu'))
-final_cnn.add(AveragePooling2D(pool_size=(2,2)))
+final_cnn.add(MaxPooling2D(pool_size=(2,2)))
 
-# A GlobalAveragePooling2D layer before going into Dense layers below.
-# GlobalAveragePooling2D layer gives no. of outputs equal to no. of filters in last Conv2D layer above (256).
-final_cnn.add(GlobalAveragePooling2D())
+# A GlobalMaxPooling2D layer before going into Dense layers below.
+# GlobalMaxPooling2D layer gives no. of outputs equal to no. of filters in last Conv2D layer above (256).
+final_cnn.add(GlobalMaxPooling2D())
 
-# One Dense layer with 132 nodes so as to taper down the no. of nodes from no. of outputs of GlobalAveragePooling2D layer above towards no. of nodes in output layer below (7).
+# One Dense layer with 132 nodes so as to taper down the no. of nodes from no. of outputs of GlobalMaxPooling2D layer above towards no. of nodes in output layer below (7).
 final_cnn.add(Dense(132, activation='relu'))
 
 # Output layer with 7 nodes (equal to the no. of classes).
@@ -157,11 +163,15 @@ final_cnn.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['a
 
 
 # Fitting the above created CNN model.
+'''
+
+final_cnn = load_model('my_model_og2.h5')
 
 final_cnn_history = final_cnn.fit(train_dataset,
                                   validation_data=test_dataset,
-                                  epochs=1,
+                                  epochs=2,
                                   shuffle=False    # shuffle=False to reduce randomness and increase reproducibility
                                  )
 
 
+final_cnn.save('my_model_og3.h5') 
