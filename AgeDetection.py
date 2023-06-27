@@ -165,13 +165,13 @@ final_cnn.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['a
 # Fitting the above created CNN model.
 '''
 
-final_cnn = load_model('my_model_og2.h5')
+final_cnn = load_model('my_model_og4.h5')
 
 final_cnn_history = final_cnn.fit(train_dataset,
                                   validation_data=test_dataset,
-                                  epochs=2,
+                                  epochs=1,
                                   shuffle=False    # shuffle=False to reduce randomness and increase reproducibility
                                  )
 
 
-final_cnn.save('my_model_og3.h5') 
+final_cnn.save('my_model_og4.h5') 
